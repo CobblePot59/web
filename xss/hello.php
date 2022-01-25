@@ -1,3 +1,3 @@
 <?php
-    echo "Bonjour ".$_POST['login']." !"
+    echo "Bonjour ".$_POST['login']." !";
 ?> 
