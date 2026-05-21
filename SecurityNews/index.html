@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security News</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        header {
+            width: 100%;
+            background: #161b22;
+            border-bottom: 1px solid #30363d;
+            padding: 18px 40px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .logo {
+            color: #58a6ff;
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        .logo span { color: #f0f6fc; }
+        .badge {
+            display: inline-block;
+            background: #1f6feb;
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .container {
+            width: 100%;
+            max-width: 680px;
+            padding: 80px 20px 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .icon-shield {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 12px #58a6ff88);
+        }
+        h1 {
+            font-size: 2rem;
+            color: #f0f6fc;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #8b949e;
+            margin-bottom: 48px;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+        .search-form {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 14px 18px;
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            color: #f0f6fc;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        input[type="text"]::placeholder { color: #484f58; }
+        input[type="text"]:focus {
+            border-color: #58a6ff;
+            box-shadow: 0 0 0 3px #1f6feb33;
+        }
+        button[type="submit"] {
+            padding: 14px 28px;
+            background: #238636;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+        button[type="submit"]:hover { background: #2ea043; }
+        button[type="submit"]:disabled { background: #1a4a24; cursor: default; }
+        .hint {
+            margin-top: 16px;
+            color: #484f58;
+            font-size: 0.82rem;
+        }
+
+        /* Results */
+        #results {
+            width: 100%;
+            max-width: 800px;
+            padding: 0 20px 40px;
+            display: none;
+            text-align: left;
+        }
+        .results-title {
+            font-size: 1.2rem;
+            color: #f0f6fc;
+            margin-bottom: 4px;
+        }
+        .results-count {
+            color: #8b949e;
+            font-size: 0.85rem;
+            margin-bottom: 24px;
+        }
+        .card {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 10px;
+            padding: 24px;
+            margin-bottom: 18px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .card:hover {
+            border-color: #58a6ff;
+            box-shadow: 0 0 0 1px #1f6feb33;
+        }
+        .card h2 {
+            color: #f0f6fc;
+            font-size: 1.15rem;
+            margin-bottom: 6px;
+        }
+        .card .meta {
+            color: #8b949e;
+            font-size: 0.8rem;
+            margin-bottom: 14px;
+        }
+        .card p {
+            color: #c9d1d9;
+            line-height: 1.75;
+            white-space: pre-wrap;
+            font-size: 0.93rem;
+        }
+        .no-results {
+            text-align: center;
+            color: #8b949e;
+            padding: 40px 0;
+        }
+        .no-results .icon { font-size: 2.5rem; margin-bottom: 12px; }
+        .error-box {
+            background: #3d1a1a;
+            border: 1px solid #6e3030;
+            color: #f85149;
+            padding: 16px;
+            border-radius: 8px;
+        }
+        footer {
+            margin-top: auto;
+            padding: 24px;
+            color: #484f58;
+            font-size: 0.8rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">Security<span>News</span></div>
+    </header>
+
+    <div class="container">
+        <div class="icon-shield">&#128737;</div>
+        <h1>Article Search</h1>
+        <p class="subtitle">Browse our cybersecurity article database.<br>Type a keyword to find an article.</p>
+        <form class="search-form" id="searchForm">
+            <input type="text" id="searchInput" name="titre" placeholder="e.g. cve, windows, supply chain…" autofocus />
+            <button type="submit" id="searchBtn">Search</button>
+        </form>
+    </div>
+
+    <div id="results"></div>
+
+    <footer>Security News &copy; 2026</footer>
+
+    <script>
+        const form = document.getElementById('searchForm');
+        const input = document.getElementById('searchInput');
+        const btn = document.getElementById('searchBtn');
+        const resultsDiv = document.getElementById('results');
+
+        form.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const query = input.value.trim();
+            if (!query) return;
+
+            btn.disabled = true;
+            btn.textContent = 'Searching…';
+            resultsDiv.style.display = 'none';
+
+            try {
+                const body = new FormData();
+                body.append('titre', query);
+                const res = await fetch('search.php', { method: 'POST', body });
+                const data = await res.json();
+
+                let html = '';
+
+                if (data.error) {
+                    html = `<div class="error-box">${data.error}</div>`;
+                } else {
+                    html += `<p class="results-title">Results for &laquo;&nbsp;${escHtml(query)}&nbsp;&raquo;</p>`;
+                    html += `<p class="results-count">${data.length} article(s) found</p>`;
+
+                    if (data.length === 0) {
+                        html += `<div class="no-results"><div class="icon">&#128235;</div><p>No articles match this search.</p></div>`;
+                    } else {
+                        data.forEach(function (article) {
+                            html += `
+                            <div class="card">
+                                <h2>${escHtml(article.titre)}</h2>
+                                <div class="meta">By <strong>${escHtml(article.auteur)}</strong> &middot; ${escHtml(article.date)}</div>
+                                <p>${escHtml(article.texte)}</p>
+                            </div>`;
+                        });
+                    }
+                }
+
+                resultsDiv.innerHTML = html;
+                resultsDiv.style.display = 'block';
+                resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } catch (err) {
+                resultsDiv.innerHTML = `<div class="error-box">Unable to reach the server.</div>`;
+                resultsDiv.style.display = 'block';
+            }
+
+            btn.disabled = false;
+            btn.textContent = 'Search';
+        });
+
+        function escHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+    </script>
+</body>
+</html>
